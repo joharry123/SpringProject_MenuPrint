@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="menu.com.project">
+
+	<resultMap type="CookFoodVo" id="rType">
+		<result property="startDate" column="YMD" />
+		<result property="dayOfWeek" column="dayOfWeek" />
+
+		<result property="restCode" column="RESTAURANT_ID" />
+		<result property="mealTypeCode" column="MEAL_ID" />
+		<result property="mealTypeName" column="CODE_NM" />
+
+		<result property="foodCode" column="FOOD_ID" />
+		<result property="foodName" column="FOOD_NM" />
+		<result property="ingredientsName" column="INGREDIENTS_NM" />
+	</resultMap>
+
+
+
+
+	<!-- <select id="get_cms_menu" resultMap="rType"> -->
+
+	<!-- SELECT * -->
+	<!-- FROM CMS_FOOD cf -->
+	<!-- LEFT OUTER JOIN CMS_RECIPE cr ON cr.FOOD_ID = cf.FOOD_ID -->
+	<!-- LEFT OUTER -->
+	<!-- JOIN CMS_INGREDIENTS ci ON cr.INGREDIENTS_ID = -->
+	<!-- ci.INGREDIENTS_ID -->
+	<!-- LEFT -->
+	<!-- OUTER JOIN CMS_MENU cm ON cm.FOOD_ID = cf.FOOD_ID -->
+	<!-- </select> -->
+
+	<select id="GetSelectedMenu" resultMap="rType"
+		parameterType="CookFoodVo">      
+    
+		<![CDATA[         
+		SELECT TO_CHAR(cm.YMD,'YYYY-MM-DD') AS YMD,TO_CHAR(cm.YMD,'D') AS dayOfWeek
+		
+		, cm.RESTAURANT_ID, cm.MEAL_ID,cf.FOOD_ID, cf.FOOD_NM, ci.INGREDIENTS_NM, ccc.CODE_NM 
+ 		FROM CMS_FOOD cf    
+ 		LEFT OUTER JOIN CMS_RECIPE cr ON cr.FOOD_ID = cf.FOOD_ID 
+ 		LEFT OUTER JOIN CMS_INGREDIENTS ci ON cr.INGREDIENTS_ID = ci.INGREDIENTS_ID 
+ 		LEFT OUTER JOIN CMS_MENU cm ON cm.FOOD_ID = cf.FOOD_ID
+ 		LEFT OUTER JOIN CMS_COMMON_CODE ccc ON ccc.CODE_ID = cm.MEAL_ID 
+		WHERE cm.RESTAURANT_ID = #{restCode} AND
+		TO_CHAR(cm.YMD,'YYYY-MM-DD')>=#{startDate} AND 
+		TO_CHAR(cm.YMD,'YYYY-MM-DD')<=#{endDate}
+		]]>
+		<if test="mealTypeCode!='M00'">
+			AND cm.MEAL_ID=#{mealTypeCode}
+		</if>
+		ORDER BY cm.MEAL_ID ASC , cm.YMD ASC , cm.FOOD_ID , cr.INGREDIENTS_ID    
+	</select>
+
+</mapper>
+  
